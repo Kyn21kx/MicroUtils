@@ -26,6 +26,8 @@ public:
 
   static float DistanceToSqr(const Color& from, const Color& to);
 
+  operator uint32_t() const;
+
 private:
   float m_red = 0.0f;
   float m_green = 0.0f;

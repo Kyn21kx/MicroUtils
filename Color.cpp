@@ -68,4 +68,7 @@ static float DistanceToSqr(const Color& from, const Color& to) {
   return (rDiff * rDiff) + (gDiff * gDiff) + (bDiff * bDiff); 
 }
   
+Color::operator uint32_t() const {
+  return this->ToUInt32();
+}
 
