@@ -21,8 +21,7 @@ enum ELogLevel : uint16_t {
 
 class Logger {
 public:
-  static void Begin(Print* output);
-
+  
   static void LogLevel(ELogLevel level, const char* format, ...);
 
   static void DebugLine(const char* format, ...);

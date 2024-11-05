@@ -3,24 +3,29 @@
 #if MICRO_PLATFORM
   #include <stdarg.h>
   #include <string.h>
+  #define OUTPUT_PTR &Serial
 #else
   #include <cstdarg>
   #include <cstring>
+  #define OUTPUT_PTR stdout
 #endif
 
 #include <stdint.h>
-
-constexpr uint32_t MAX_LOG_BUFFER_SIZE = 256;
-
-constexpr uint32_t MAX_FORMAT_BUFFER_SIZE = 200;
+#if !defined(ARDUINO_AVR_NANO)
+  constexpr uint32_t MAX_LOG_BUFFER_SIZE = 256;
+  constexpr uint32_t MAX_FORMAT_BUFFER_SIZE = 200;
+#else
+//Handle lower end controllers
+  constexpr uint32_t MAX_LOG_BUFFER_SIZE = 128;
+  constexpr uint32_t MAX_FORMAT_BUFFER_SIZE = 100;
+#endif
 
 Print *Logger::s_output;
 
-void Logger::Begin(Print *output) { s_output = output; }
-
 void Logger::LogLevel(ELogLevel level, const char *format, ...) {
-  if (s_output == nullptr)
-    return;
+  if (s_output == nullptr) {
+    s_output = OUTPUT_PTR;
+  }
   va_list args;
   va_start(args, format);
   char formatBuffer[MAX_FORMAT_BUFFER_SIZE] = "";
@@ -41,10 +46,10 @@ void Logger::LogLevel(ELogLevel level, const char *format, ...) {
     break;
   }
 
-  strncat(formatBuffer, format, MAX_LOG_BUFFER_SIZE);
+  strncat(formatBuffer, format, MAX_FORMAT_BUFFER_SIZE);
 
 #if MICRO_PLATFORM
-  vsprintf(printBuffer, formatBuffer, args);
+  vsnprintf(printBuffer, MAX_LOG_BUFFER_SIZE, formatBuffer, args);
   s_output->print(printBuffer);
 #else
 
